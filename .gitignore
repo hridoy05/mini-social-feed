@@ -1,0 +1,31 @@
+# Node
+node_modules/
+dist/
+*.log
+
+# Env files
+.env
+.env.local
+.env.test
+
+# Secrets
+serviceAccountKey.json
+google-services.json
+*.keystore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Expo build artifacts
+mobile/.expo/
+mobile/.expo-shared/
+mobile/dist/
+mobile/*.apk
+
+# Prisma
+backend/prisma/migrations/**/migration_lock.toml
