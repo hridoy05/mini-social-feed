@@ -20,8 +20,22 @@ model User {
   email     String   @unique
   password  String
   fcmToken  String?
+  posts     Post[] 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  text      String   @db.VarChar(500)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("posts")
 }
