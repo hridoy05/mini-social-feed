@@ -29,6 +29,10 @@ export async function signup(
   };
 }
 
+export async function updateFcmToken(userId: string, fcmToken: string): Promise<void> {
+  await userRepository.updateFcmToken({ id: userId, fcmToken });
+}
+
 export async function login(email: string, password: string): Promise<AuthResult> {
   const user = await userRepository.findByEmail(email);
   if (!user) throw new UnauthorizedError('Invalid credentials');

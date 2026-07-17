@@ -13,3 +13,7 @@ export const loginRules = [
   body('email').isEmail().withMessage('Valid email required').normalizeEmail(),
   body('password').isString().notEmpty().withMessage('Password required'),
 ];
+
+export const updateFcmTokenRules = [
+  body('fcmToken').isString().trim().notEmpty().withMessage('fcmToken is required'),
+];
