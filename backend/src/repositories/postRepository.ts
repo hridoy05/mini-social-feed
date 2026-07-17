@@ -3,7 +3,7 @@ import { CreatePostInput, FindFeedInput } from './types';
 
 const publicAuthor = { select: { id: true, username: true } };
 
-// One shape reused everywhere a post is returned.
+
 const feedInclude = {
   author: publicAuthor,
   likes: { select: { userId: true } },
