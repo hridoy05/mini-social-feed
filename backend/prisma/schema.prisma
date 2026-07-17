@@ -21,6 +21,7 @@ model User {
   password  String
   fcmToken  String?
   posts     Post[] 
+  comments  Comment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -32,10 +33,26 @@ model Post {
   text      String   @db.VarChar(500)
   authorId  String
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments  Comment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([authorId])
   @@index([createdAt])
   @@map("posts")
+}
+
+
+model Comment {
+  id        String   @id @default(uuid())
+  text      String   @db.VarChar(500)
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@map("comments")
 }
