@@ -1,34 +1,55 @@
-import { SymbolView } from 'expo-symbols';
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { useAuth } from '@/src/context/AuthContext';
+import { colors, typography } from '@/src/theme';
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+function SignOutButton() {
+  const { signOut } = useAuth();
 
+  return (
+    <Pressable onPress={() => signOut()} style={styles.signOutButton} hitSlop={8}>
+      <Text style={styles.signOutText}>Sign out</Text>
+    </Pressable>
+  );
+}
+
+export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textFaint,
+        headerStyle: {
+          backgroundColor: colors.bg,
+          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderBottomColor: colors.border,
+        },
+        headerTitleStyle: {
+          color: colors.text,
+        },
+        headerRight: () => <SignOutButton />,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{
-                ios: 'house.fill',
-                android: 'home',
-                web: 'home',
-              }}
-              tintColor={color}
-              size={28}
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="create"
+        options={{
+          title: 'New Post',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'add-circle' : 'add-circle-outline'}
+              size={24}
+              color={color}
             />
           ),
         }}
@@ -36,3 +57,14 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  signOutButton: {
+    marginRight: 16,
+  },
+  signOutText: {
+    fontSize: typography.action.fontSize,
+    fontWeight: typography.action.fontWeight,
+    color: colors.primary,
+  },
+});

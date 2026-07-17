@@ -3,10 +3,10 @@ import { StyleSheet, Text } from 'react-native';
 import { Screen } from '@/src/components/ui/Screen';
 import { colors, typography } from '@/src/theme';
 
-export default function FeedScreen() {
+export default function SignupScreen() {
   return (
     <Screen style={styles.container}>
-      <Text style={styles.text}>Feed</Text>
+      <Text style={styles.text}>Signup</Text>
     </Screen>
   );
 }
