@@ -1,9 +1,9 @@
 /**
- * Maps an axios error from an auth request into a { field: message } map.
+ * Maps an axios error from an API request into a { field: message } map.
  * `conflictFields` lists which field names to check a ConflictError's message
  * against (e.g. ['username', 'email']); unmatched errors fall back to `form`.
  */
-export function parseAuthError(
+export function parseApiError(
   err: any,
   conflictFields: string[] = []
 ): Record<string, string> {

@@ -10,7 +10,7 @@ import { authFormStyles as styles } from '@/src/components/ui/authFormStyles';
 import client from '@/src/api/client';
 import { useAuth } from '@/src/context/AuthContext';
 import { fieldErrors, signupSchema } from '@/src/validation/auth';
-import { parseAuthError } from '@/src/utils/authErrors';
+import { parseApiError } from '@/src/utils/apiErrors';
 
 const CONFLICT_FIELDS = ['username', 'email'];
 
@@ -36,7 +36,7 @@ export default function SignupScreen() {
       const { token, user } = res.data;
       await signIn(token, user);
     } catch (err) {
-      setErrors(parseAuthError(err, CONFLICT_FIELDS));
+      setErrors(parseApiError(err, CONFLICT_FIELDS));
     } finally {
       setSubmitting(false);
     }
