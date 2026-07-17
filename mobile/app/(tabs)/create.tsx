@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
@@ -8,8 +9,9 @@ import { Button } from '@/src/components/ui/Button';
 import { FieldError } from '@/src/components/ui/FieldError';
 import { Input } from '@/src/components/ui/Input';
 import { Screen } from '@/src/components/ui/Screen';
+import { useResponsive } from '@/src/hooks/useResponsive';
 import { colors, spacing, typography } from '@/src/theme';
-import { parseApiError } from '@/src/utils/apiErrors';
+import { getErrorMessage } from '@/src/utils/apiError';
 
 const MAX_LENGTH = 500;
 const WARN_THRESHOLD = 480;
@@ -17,6 +19,7 @@ const CONFIRMATION_DELAY_MS = 700;
 
 export default function CreatePostScreen() {
   const router = useRouter();
+  const { isTablet } = useResponsive();
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,11 +48,12 @@ export default function CreatePostScreen() {
       setText('');
       setSubmitting(false);
       setPosted(true);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigateTimeout.current = setTimeout(() => {
         router.replace('/(tabs)');
       }, CONFIRMATION_DELAY_MS);
     } catch (err) {
-      setError(parseApiError(err).form ?? 'Something went wrong. Try again.');
+      setError(getErrorMessage(err));
       setSubmitting(false);
     }
   }
@@ -59,7 +63,7 @@ export default function CreatePostScreen() {
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <Screen style={styles.container}>
+      <Screen style={[styles.container, isTablet && styles.containerTablet]}>
         {posted ? (
           <View style={styles.confirmation}>
             <Ionicons name="checkmark-circle" size={48} color={colors.primary} />
@@ -111,6 +115,9 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: spacing.lg,
+  },
+  containerTablet: {
+    padding: spacing.xl,
   },
   errorWrap: {
     marginBottom: spacing.lg,

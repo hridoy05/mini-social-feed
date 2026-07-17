@@ -9,7 +9,16 @@ function SignOutButton() {
   const { signOut } = useAuth();
 
   return (
-    <Pressable onPress={() => signOut()} style={styles.signOutButton} hitSlop={8}>
+    <Pressable
+      onPress={() => signOut()}
+      style={({ pressed }) => [
+        styles.signOutButton,
+        pressed && styles.signOutButtonPressed,
+      ]}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel="Sign out"
+    >
       <Text style={styles.signOutText}>Sign out</Text>
     </Pressable>
   );
@@ -61,6 +70,9 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   signOutButton: {
     marginRight: 16,
+  },
+  signOutButtonPressed: {
+    opacity: 0.6,
   },
   signOutText: {
     fontSize: typography.action.fontSize,

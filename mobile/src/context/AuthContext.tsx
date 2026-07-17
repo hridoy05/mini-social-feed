@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import client, { AUTH_TOKEN_KEY } from '../api/client';
 import { registerForPushNotifications } from '../utils/notifications';
+import { setSignOutHandler } from './authRef';
 
 const AUTH_USER_KEY = 'authUser';
 
@@ -68,6 +69,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ]);
     setUser(null);
   };
+
+  useEffect(() => {
+    setSignOutHandler(() => {
+      signOut();
+    });
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signOut }}>

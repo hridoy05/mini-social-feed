@@ -18,6 +18,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const canSubmit = email.trim().length > 0 && password.length > 0;
 
   async function handleSubmit() {
     const result = loginSchema.safeParse({ email, password });
@@ -75,7 +76,7 @@ export default function LoginScreen() {
           title="Sign In"
           onPress={handleSubmit}
           loading={submitting}
-          disabled={submitting}
+          disabled={submitting || !canSubmit}
           style={styles.submitButton}
         />
         <FieldError message={errors.form} />

@@ -1,9 +1,11 @@
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import { ErrorBoundary } from '@/src/components/ErrorBoundary';
+import { OfflineBanner } from '@/src/components/OfflineBanner';
 import { AuthProvider, useAuth } from '@/src/context/AuthContext';
-import { colors } from '@/src/theme';
+import { colors, spacing, typography } from '@/src/theme';
 import { setupNotificationHandler, setupTapHandler } from '@/src/utils/notifications';
 
 export default function RootLayout() {
@@ -12,9 +14,11 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <RootLayoutNav />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
@@ -43,19 +47,34 @@ function RootLayoutNav() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator color={colors.primary} size="large" />
+        <Text style={styles.wordmark}>minisky</Text>
+        <ActivityIndicator color={colors.primary} />
       </View>
     );
   }
 
-  return <Slot />;
+  return (
+    <View style={styles.appContainer}>
+      <OfflineBanner />
+      <Slot />
+    </View>
+  );
 }
 
-const styles = {
+const styles = StyleSheet.create({
+  appContainer: {
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.bg,
+    gap: spacing.lg,
   },
-};
+  wordmark: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+});

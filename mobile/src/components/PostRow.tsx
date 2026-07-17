@@ -1,10 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import client from '../api/client';
 import { Comment, Post, ToggleLikeResponse } from '../api/types';
+import { useResponsive } from '../hooks/useResponsive';
 import { colors, radius, spacing, typography } from '../theme';
+import { getErrorMessage } from '../utils/apiError';
 import { Avatar } from './ui/Avatar';
 import { Input } from './ui/Input';
 
@@ -28,16 +31,19 @@ export function timeAgo(iso: string): string {
 }
 
 export function PostRow({ post, currentUserId }: PostRowProps) {
+  const { isTablet } = useResponsive();
   const [liked, setLiked] = useState(() =>
     post.likes.some((like) => like.userId === currentUserId)
   );
   const [likeCount, setLikeCount] = useState(post._count.likes);
   const [likePending, setLikePending] = useState(false);
+  const [likeError, setLikeError] = useState<string | null>(null);
 
   const [comments, setComments] = useState<Comment[]>(post.comments);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
 
   useEffect(() => {
     setLiked(post.likes.some((like) => like.userId === currentUserId));
@@ -51,18 +57,21 @@ export function PostRow({ post, currentUserId }: PostRowProps) {
     const prevCount = likeCount;
     const nextLiked = !prevLiked;
 
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setLiked(nextLiked);
     setLikeCount(prevCount + (nextLiked ? 1 : -1));
     setLikePending(true);
+    setLikeError(null);
     try {
       const res = await client.post<ToggleLikeResponse>(
         `/posts/${post.id}/like`
       );
       setLiked(res.data.liked);
       setLikeCount(res.data.count);
-    } catch {
+    } catch (err) {
       setLiked(prevLiked);
       setLikeCount(prevCount);
+      setLikeError(getErrorMessage(err));
     } finally {
       setLikePending(false);
     }
@@ -73,22 +82,24 @@ export function PostRow({ post, currentUserId }: PostRowProps) {
     if (!text || commentSubmitting) return;
 
     setCommentSubmitting(true);
+    setCommentError(null);
     try {
       const res = await client.post<Comment>(`/posts/${post.id}/comment`, {
         text,
       });
       setComments((prev) => [...prev, res.data]);
       setCommentText('');
-    } catch {
+    } catch (err) {
       // Leave the draft in place so the user can retry.
+      setCommentError(getErrorMessage(err));
     } finally {
       setCommentSubmitting(false);
     }
   }
 
   return (
-    <View style={styles.row}>
-      <Avatar username={post.author.username} size={40} />
+    <View style={[styles.row, isTablet && styles.rowTablet]}>
+      <Avatar username={post.author.username} size={isTablet ? 56 : 40} />
       <View style={styles.content}>
         <View style={styles.headerRow}>
           <Text style={styles.username}>{post.author.username}</Text>
@@ -100,8 +111,13 @@ export function PostRow({ post, currentUserId }: PostRowProps) {
         <View style={styles.actions}>
           <Pressable
             onPress={() => setCommentsOpen((open) => !open)}
-            style={styles.actionButton}
+            style={({ pressed }) => [
+              styles.actionButton,
+              pressed && styles.actionButtonPressed,
+            ]}
             hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Comments"
           >
             <Ionicons
               name="chatbubble-outline"
@@ -115,9 +131,14 @@ export function PostRow({ post, currentUserId }: PostRowProps) {
 
           <Pressable
             onPress={handleLike}
-            style={styles.actionButton}
+            style={({ pressed }) => [
+              styles.actionButton,
+              pressed && styles.actionButtonPressed,
+            ]}
             hitSlop={8}
             disabled={likePending}
+            accessibilityRole="button"
+            accessibilityLabel={liked ? 'Unlike' : 'Like'}
           >
             <Ionicons
               name={liked ? 'heart' : 'heart-outline'}
@@ -134,16 +155,28 @@ export function PostRow({ post, currentUserId }: PostRowProps) {
           </Pressable>
         </View>
 
+        {likeError && <Text style={styles.inlineError}>{likeError}</Text>}
+
         {commentsOpen && (
           <View style={styles.commentSection}>
-            {comments.map((comment) => (
-              <View key={comment.id} style={styles.commentRow}>
-                <Text style={styles.commentUsername}>
-                  {comment.user.username}
-                </Text>
-                <Text style={styles.commentText}>{comment.text}</Text>
-              </View>
-            ))}
+            {comments.length === 0 ? (
+              <Text style={styles.noCommentsText}>
+                No comments yet. Start the conversation.
+              </Text>
+            ) : (
+              comments.map((comment) => (
+                <View key={comment.id} style={styles.commentRow}>
+                  <Text style={styles.commentUsername}>
+                    {comment.user.username}
+                  </Text>
+                  <Text style={styles.commentText}>{comment.text}</Text>
+                </View>
+              ))
+            )}
+
+            {commentError && (
+              <Text style={styles.inlineError}>{commentError}</Text>
+            )}
 
             <View style={styles.commentInputRow}>
               <Input
@@ -182,6 +215,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: colors.border,
   },
+  rowTablet: {
+    padding: spacing.xl,
+  },
   content: {
     flex: 1,
     marginLeft: spacing.md,
@@ -216,12 +252,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.xs,
   },
+  actionButtonPressed: {
+    opacity: 0.6,
+  },
   actionCount: {
     fontSize: typography.meta.fontSize,
     color: colors.textMuted,
   },
   actionCountLiked: {
     color: colors.danger,
+  },
+  inlineError: {
+    fontSize: typography.meta.fontSize,
+    color: colors.danger,
+    marginTop: spacing.xs,
+  },
+  noCommentsText: {
+    fontSize: typography.meta.fontSize,
+    color: colors.textFaint,
+    marginBottom: spacing.sm,
   },
   commentSection: {
     marginTop: spacing.md,

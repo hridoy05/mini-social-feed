@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { triggerSignOut } from '../context/authRef';
 import { API_BASE_URL } from './env';
 
 export const AUTH_TOKEN_KEY = 'authToken';
@@ -22,6 +23,7 @@ client.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
+      triggerSignOut();
     }
     return Promise.reject(error);
   }

@@ -21,6 +21,8 @@ export default function SignupScreen() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const canSubmit =
+    username.trim().length > 0 && email.trim().length > 0 && password.length > 0;
 
   async function handleSubmit() {
     const result = signupSchema.safeParse({ username, email, password });
@@ -89,7 +91,7 @@ export default function SignupScreen() {
           title="Sign Up"
           onPress={handleSubmit}
           loading={submitting}
-          disabled={submitting}
+          disabled={submitting || !canSubmit}
           style={styles.submitButton}
         />
         <FieldError message={errors.form} />
