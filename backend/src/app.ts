@@ -1,5 +1,6 @@
 import express, { Application } from 'express';
 import cors from 'cors';
+import authRoutes from './routes/authRoutes';
 import { errorHandler } from './middleware/errorHandler';
 
 export function createApp(): Application {
@@ -7,10 +8,10 @@ export function createApp(): Application {
   app.use(cors());
   app.use(express.json());
 
+  const API_V1 = '/api/v1';
+
   app.get('/health', (_req, res) => res.json({ status: 'ok' }));
-
-  // Routes will be added here in later commits
-
+  app.use(`${API_V1}/auth`, authRoutes);
   app.use(errorHandler); 
   return app;
 }
