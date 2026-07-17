@@ -4,8 +4,13 @@ import { ActivityIndicator, View } from 'react-native';
 
 import { AuthProvider, useAuth } from '@/src/context/AuthContext';
 import { colors } from '@/src/theme';
+import { setupNotificationHandler, setupTapHandler } from '@/src/utils/notifications';
 
 export default function RootLayout() {
+  useEffect(() => {
+    setupNotificationHandler();
+  }, []);
+
   return (
     <AuthProvider>
       <RootLayoutNav />
@@ -17,6 +22,11 @@ function RootLayoutNav() {
   const { user, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = setupTapHandler(() => router.push('/(tabs)'));
+    return unsubscribe;
+  }, [router]);
 
   useEffect(() => {
     if (loading) return;

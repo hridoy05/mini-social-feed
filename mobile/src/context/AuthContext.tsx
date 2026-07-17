@@ -5,7 +5,8 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { AUTH_TOKEN_KEY } from '../api/client';
+import client, { AUTH_TOKEN_KEY } from '../api/client';
+import { registerForPushNotifications } from '../utils/notifications';
 
 const AUTH_USER_KEY = 'authUser';
 
@@ -49,6 +50,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.setItem(AUTH_USER_KEY, JSON.stringify(user)),
     ]);
     setUser(user);
+
+    try {
+      const pushToken = await registerForPushNotifications();
+      if (pushToken) {
+        await client.post('/auth/fcm-token', { token: pushToken });
+      }
+    } catch {
+      // Push registration is best-effort and shouldn't block login.
+    }
   };
 
   const signOut = async () => {
