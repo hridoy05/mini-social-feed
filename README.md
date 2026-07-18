@@ -96,3 +96,18 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 - Structured logger (e.g. Pino/Winston) instead of `morgan`
 - Sentry for error tracing
 - Uptime/metrics monitoring
+- 
+## Screenshots
+<p>
+  <img width="200" alt="Screenshot_20260718_191638_host_exp_exponent_ExperienceActivity" src="https://github.com/user-attachments/assets/412720a9-eac1-48ae-b5ec-3766b439ea3d" />
+  
+  <img width="200" alt="Screenshot_20260718_191631_host_exp_exponent_ExperienceActivity" src="https://github.com/user-attachments/assets/43f5a559-6b14-486a-8e79-013d37560fcb" />
+
+<img width="200" alt="Screenshot_20260718_191553_host_exp_exponent_ExperienceActivity" src="https://github.com/user-attachments/assets/69a552e6-f82e-4149-a473-0242585db1a1" />
+
+<img width="200" alt="Screenshot_20260718_191546_host_exp_exponent_ExperienceActivity" src="https://github.com/user-attachments/assets/ad2a2572-5a1d-42cb-bc85-ee4da927d93a" />
+
+<img width="200" alt="Screenshot_20260718_191616_host_exp_exponent_ExperienceActivity" src="https://github.com/user-attachments/assets/436bbb20-617c-46da-87c2-3a67b22a5566" />
+
+<p/>
+
