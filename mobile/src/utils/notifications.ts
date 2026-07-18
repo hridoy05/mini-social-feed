@@ -1,9 +1,13 @@
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
+import { isRunningInExpoGo } from "expo";
+import * as Device from "expo-device";
+import { Platform } from "react-native";
+
+const pushSupported = Platform.OS !== "web" && !isRunningInExpoGo();
 
 export function setupNotificationHandler() {
+  if (!pushSupported) return;
+
+  const Notifications = require("expo-notifications");
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowBanner: true,
@@ -15,36 +19,41 @@ export function setupNotificationHandler() {
 }
 
 export async function registerForPushNotifications(): Promise<string | null> {
-  if (!Device.isDevice) {
+  if (!Device.isDevice || !pushSupported) {
     return null;
   }
 
+  const Notifications = require("expo-notifications");
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
-  if (existingStatus !== 'granted') {
+  if (existingStatus !== "granted") {
     const { status } = await Notifications.requestPermissionsAsync();
     finalStatus = status;
   }
-  if (finalStatus !== 'granted') {
+  if (finalStatus !== "granted") {
     return null;
   }
 
+  const messaging = require("@react-native-firebase/messaging").default;
   return messaging().getToken();
 }
 
 export function setupTapHandler(onTap: (postId: string) => void) {
-  if (Platform.OS === 'web') {
+  if (!pushSupported) {
     return () => {};
   }
 
-  const unsubscribe = messaging().onNotificationOpenedApp((remoteMessage) => {
-    const postId = remoteMessage?.data?.postId;
-    if (postId) onTap(String(postId));
-  });
+  const messaging = require("@react-native-firebase/messaging").default;
+  const unsubscribe = messaging().onNotificationOpenedApp(
+    (remoteMessage: any) => {
+      const postId = remoteMessage?.data?.postId;
+      if (postId) onTap(String(postId));
+    },
+  );
 
   messaging()
     .getInitialNotification()
-    .then((remoteMessage) => {
+    .then((remoteMessage: any) => {
       const postId = remoteMessage?.data?.postId;
       if (postId) onTap(String(postId));
     });
