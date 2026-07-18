@@ -14,7 +14,7 @@
   "prisma:migrate": "prisma migrate deploy",
   "prisma:studio": "prisma studio",
   "postinstall": "prisma generate",
-  "render-build": "npm install && npx prisma generate && npx prisma migrate deploy && npm run build",
+  "render-build": "npm install --include=dev && npx prisma generate && npx prisma migrate deploy && npm run build",
   "render-start": "npm start"
 },
   "keywords": [],
