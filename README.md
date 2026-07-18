@@ -89,3 +89,10 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ## Rate Limiting
 
 `/api/v1/auth/*` routes: 20 requests / 15 min / IP → `429 TooManyRequestsError`.
+
+## Improvements
+
+- Unit + integration tests
+- Structured logger (e.g. Pino/Winston) instead of `morgan`
+- Sentry for error tracing
+- Uptime/metrics monitoring
