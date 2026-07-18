@@ -37,7 +37,9 @@
         }
       ],
       "@react-native-firebase/app",
-      ["@react-native-firebase/messaging"],
+      [
+        "@react-native-firebase/messaging"
+      ],
       [
         "expo-notifications",
         {
@@ -56,6 +58,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "657d2645-a917-4109-831c-b09f50411325"
+      }
+    },
+    "owner": "hridoy71s-team"
   }
 }
