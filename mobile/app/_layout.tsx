@@ -1,12 +1,14 @@
 import { Slot, useRouter, useSegments } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ErrorBoundary } from '@/src/components/ErrorBoundary';
 import { OfflineBanner } from '@/src/components/OfflineBanner';
 import { AuthProvider, useAuth } from '@/src/context/AuthContext';
-import { colors, spacing, typography } from '@/src/theme';
 import { setupNotificationHandler, setupTapHandler } from '@/src/utils/notifications';
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   useEffect(() => {
@@ -44,13 +46,14 @@ function RootLayoutNav() {
     }
   }, [user, loading, segments, router]);
 
+  useEffect(() => {
+    if (!loading) {
+      SplashScreen.hideAsync();
+    }
+  }, [loading]);
+
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.wordmark}>minisky</Text>
-        <ActivityIndicator color={colors.primary} />
-      </View>
-    );
+    return null;
   }
 
   return (
@@ -64,17 +67,5 @@ function RootLayoutNav() {
 const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.bg,
-    gap: spacing.lg,
-  },
-  wordmark: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: colors.primary,
   },
 });
