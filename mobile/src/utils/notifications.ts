@@ -1,5 +1,6 @@
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 
 export function setupNotificationHandler() {
@@ -32,6 +33,10 @@ export async function registerForPushNotifications(): Promise<string | null> {
 }
 
 export function setupTapHandler(onTap: (postId: string) => void) {
+  if (Platform.OS === 'web') {
+    return () => {};
+  }
+
   const unsubscribe = messaging().onNotificationOpenedApp((remoteMessage) => {
     const postId = remoteMessage?.data?.postId;
     if (postId) onTap(String(postId));
