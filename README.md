@@ -45,7 +45,7 @@ EXPO_PUBLIC_API_URL=https://mini-social-feed.onrender.com/api/v1
 
 **Backend:** Node, Express, TypeScript, Prisma, PostgreSQL, JWT, express-validator, express-rate-limit, Firebase Admin, Helmet
 
-**Mobile:** Expo, React Native, TypeScript, Axios, Firebase Messaging
+**Mobile:** Expo, Expo Router, React Native, TypeScript, Axios, Firebase Messaging
 
 ## Local Setup
 
@@ -54,8 +54,9 @@ EXPO_PUBLIC_API_URL=https://mini-social-feed.onrender.com/api/v1
 ```bash
 cd backend
 npm install
-npm run db:up          # start Postgres via Docker
-cp .env.example .env    # then set JWT_SECRET (see below)
+npm run db:up             # start Postgres (Docker)
+cp .env.example .env       # then set JWT_SECRET (see below)
+npm run prisma:migrate     # apply DB migrations (required after clone)
 npm run dev
 ```
 
@@ -85,6 +86,17 @@ Generate a valid `JWT_SECRET`:
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
+
+## Firebase Credentials
+
+Not committed to git (gitignored, contain secrets). Needed only for push notifications — app runs fine without them.
+
+| File                              | Location   | Get it from                                              |
+|------------------------------------|------------|-----------------------------------------------------------|
+| `serviceAccountKey.json`           | `backend/` | Firebase Console → Project Settings → Service Accounts → Generate new private key |
+| `google-services.json`             | `mobile/`  | Firebase Console → Project Settings → your Android app → download config file |
+
+Missing `serviceAccountKey.json` → backend logs a warning and disables push notifications, everything else still works.
 
 ## Rate Limiting
 
