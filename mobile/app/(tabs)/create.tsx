@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 
 import client from '@/src/api/client';
@@ -31,6 +31,21 @@ export default function CreatePostScreen() {
       if (navigateTimeout.current) clearTimeout(navigateTimeout.current);
     };
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        if (navigateTimeout.current) {
+          clearTimeout(navigateTimeout.current);
+          navigateTimeout.current = null;
+        }
+        setText('');
+        setError(null);
+        setPosted(false);
+        setSubmitting(false);
+      };
+    }, [])
+  );
 
   function handleChangeText(value: string) {
     setText(value);
