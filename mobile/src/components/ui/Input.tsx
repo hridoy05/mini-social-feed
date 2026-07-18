@@ -1,13 +1,23 @@
-import React from 'react';
+import { useState } from 'react';
 import { StyleSheet, TextInput, TextInputProps } from 'react-native';
 import { colors, radius, spacing, typography } from '../../theme';
 
-export function Input(props: TextInputProps) {
+export function Input({ style, onFocus, onBlur, ...props }: TextInputProps) {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <TextInput
       placeholderTextColor={colors.textFaint}
-      style={[styles.input, props.style]}
       {...props}
+      onFocus={(e) => {
+        setIsFocused(true);
+        onFocus?.(e);
+      }}
+      onBlur={(e) => {
+        setIsFocused(false);
+        onBlur?.(e);
+      }}
+      style={[styles.input, style, isFocused && styles.inputFocused]}
     />
   );
 }
@@ -20,6 +30,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     fontSize: typography.body.fontSize,
     color: colors.text,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  inputFocused: {
+    borderColor: colors.primary,
   },
 });
 
